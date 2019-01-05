@@ -51,13 +51,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	UAnimSequence* FireAnimation;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Gameplay")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Gameplay")
 	bool bIsCarryObjective;
+
+    virtual void Tick(float DeltaSeconds) override;
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	
 	/** Fires a projectile. */
 	void Fire();
+
+    UFUNCTION(Server, WithValidation, Reliable)
+    void ServerFire();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);

@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "FPSGameMode.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "UnrealNetwork.h"
 
 
 // Sets default values
@@ -36,12 +37,20 @@ void AFPSAIGuard::MoveToNextPoint()
 	UNavigationSystem::SimpleMoveToActor(GetController(), CurrentPoint);
 }
 
+void AFPSAIGuard::OnRep_GuardState()
+{
+    OnGuardStateChanged(GuardState);
+}
+
 void AFPSAIGuard::SetGuardState(EAIState NewGuardState)
 {
 	if (GuardState == NewGuardState)
 	{
 		return;
 	}
+
+    GuardState = NewGuardState;
+    OnRep_GuardState();
 
 	OnGuardStateChanged(NewGuardState);
 }
@@ -98,7 +107,7 @@ void AFPSAIGuard::OnSeenPawn(APawn* SeenPawn)
 	AController* Controller = GetController();
 	if (Controller)
 	{
-		//Controller->StopMovement();
+		Controller->StopMovement();
 	}
 }
 
@@ -121,7 +130,7 @@ void AFPSAIGuard::OnHearNoise(APawn* NoiseInstigator, const FVector& Location, f
 	AController* Controller = GetController();
 	if (Controller)
 	{
-		//Controller->StopMovement();
+		Controller->StopMovement();
 	}
 
 	SetActorRotation(NewLookAt);
@@ -140,13 +149,17 @@ void AFPSAIGuard::Tick(float DeltaSeconds)
 
 		FVector Delta = GetActorLocation() - CurrentPoint->GetActorLocation();
 		float DistanceToGoal = Delta.Size();
-
-		UE_LOG(LogTemp, Log, TEXT("%f"), DistanceToGoal);
-
-		if (DistanceToGoal < 80)
+		if (DistanceToGoal < 100)
 		{
 			MoveToNextPoint();
 		}
 	}
+}
+
+void AFPSAIGuard::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty> & OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AFPSAIGuard, GuardState);
 }
 

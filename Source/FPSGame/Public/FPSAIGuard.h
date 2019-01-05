@@ -34,6 +34,9 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+
+    virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty> & OutLifetimeProps) const override;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
@@ -43,7 +46,11 @@ protected:
 
 	FTimerHandle TimerHandle_ResetOrientation;
 
+    UPROPERTY(ReplicatedUsing=OnRep_GuardState)
 	EAIState GuardState;
+
+    UFUNCTION()
+    void OnRep_GuardState();
 
 	UPROPERTY(EditInstanceOnly, Category = "AI")
 	bool bPatrol;

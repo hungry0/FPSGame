@@ -41,5 +41,4 @@ public:
 	
 public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
 };
